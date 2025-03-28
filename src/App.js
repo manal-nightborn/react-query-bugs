@@ -11,13 +11,13 @@ function App() {
   // Bug 6: Boucle infinie à cause d'un mauvais paramétrage des dépendances de useQuery
   // L'objet {} en tant que queryKey est recréé à chaque rendu, provoquant une boucle infinie
   const { data: products, isLoading, error } = useQuery({
-    queryKey: [{}], // Devrait être ['products'] pour éviter la boucle infinie
+    queryKey: ['products'], // Devrait être ['products'] pour éviter la boucle infinie
     queryFn: fetchProducts,
     // Bug 2: Problème de gestion d'erreur qui provoque un plantage
     // Pas de gestion d'erreur appropriée
     onError: () => {
-      // Devrait gérer l'erreur correctement, par exemple:
-      // console.error('Erreur lors de la récupération des produits:', error);
+      
+      console.error('Erreur lors de la récupération des produits:', error);
       // Mais ici, on ne fait rien, ce qui provoque un plantage
     }
   });
@@ -37,7 +37,7 @@ function App() {
       // Mise à jour optimiste incorrecte - ne met pas à jour le cache correctement
       queryClient.setQueryData(['products'], (old) => {
         // Ici, on ne fait pas une copie profonde, ce qui peut causer des problèmes
-        return old; // Devrait être: old.map(p => p.id === updatedProduct.id ? updatedProduct : p)
+        return old.map(p => p.id === updatedProduct.id ? updatedProduct : p)
       });
       
       return { previousProducts };
@@ -76,16 +76,13 @@ function App() {
   const handleCancel = () => {
     setEditingProduct(null);
   };
-
+  if (isLoading) {
+      return <div className="container loading">Chargement des produits...</div>;
+  }
   // Bug 3: Erreur de rendu conditionnel pendant le chargement
-  // Le rendu conditionnel est incorrect, on essaie d'accéder à products avant de vérifier isLoading
+ 
   if (products && products.length === 0) {
     return <div className="container">Aucun produit trouvé.</div>;
-  }
-
-  // Devrait être avant la condition ci-dessus
-  if (isLoading) {
-    return <div className="container loading">Chargement des produits...</div>;
   }
 
   if (error) {
@@ -101,7 +98,7 @@ function App() {
       
       {/* Bug 5: Rendu qui cause "Object is not a React child" */}
       <div className="debug-info">
-        Informations de débogage: {products[0].rating} {/* Tente d'afficher un objet directement */}
+        Informations de débogage: {products[0].rating.title} {/* Tente d'afficher un objet directement */}
       </div>
       
       <div className="products-grid">

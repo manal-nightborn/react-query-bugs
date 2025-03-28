@@ -11,7 +11,7 @@ import App from './App';
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 0, // Devrait être plus élevé pour un bon caching
+      staleTime: 1000 * 60 * 5, // Devrait être plus élevé pour un bon caching
       cacheTime: 1000 * 60 * 5, // 5 minutes
     },
   },
